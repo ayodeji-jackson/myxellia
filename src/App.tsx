@@ -23,6 +23,7 @@ interface IData {
 }
 
 interface ICard {
+  name: string,
   icon: () => JSX.Element
   data: { 
     name: string 
@@ -30,12 +31,19 @@ interface ICard {
   }[]
 }
 
+type Links = 'dashboard' | 'listings' | 'users' | 'request' | 'applications';
+
 function App() {
-  const links = [
-    DashboardIcon, ListingsIcon, UsersIcon, RequestIcon, ApplicationsIcon
-  ];
+  const links: Record<Links, () => JSX.Element> = {
+    dashboard: DashboardIcon,
+    listings: ListingsIcon,
+    users: UsersIcon,
+    request: RequestIcon,
+    applications: ApplicationsIcon
+  };
   const cards: ICard[] = [
     { 
+      name: 'listings',
       icon: ListingsOverview, 
       data: [
         { name: 'total', count: 1800 },
@@ -44,6 +52,7 @@ function App() {
       ]
     },
     { 
+      name: 'users',
       icon: UsersOverview, 
       data: [
         { name: 'total', count: 20700 },
@@ -109,8 +118,8 @@ function App() {
                     date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase(), 
                 }}
                 components={{
-                  PreviousMonthButton: () => <button className="flex ml-10"><RightArrow className="rotate-180 size-6" /></button>,
-                  NextMonthButton: () => <button className="flex mr-10"><RightArrow className="size-6" /></button>,
+                  PreviousMonthButton: props => <button {...props} style={{ marginLeft: '3rem' }}><RightArrow className="rotate-180 size-6" /></button>,
+                  NextMonthButton: props => <button {...props} style={{ marginRight: '3rem' }}><RightArrow className="size-6" /></button>,
                 }}
               />
             </div>
@@ -123,22 +132,18 @@ function App() {
         <div className="max-w-7xls mx-auto flex justify-between items-center h-full">
           <ul className="flex gap-[21px] text-sm">
             {
-              links.map(link => {
-                const linkName = link.name.substring(0, link.name.length - 4).toLowerCase();
-
-                return (
-                  <li>
-                    <a 
-                      href={`/${linkName}`}
-                      data-is-active={location.pathname === `/${linkName}` || (linkName === 'dashboard' && location.pathname === '/')} 
-                      className="flex gap-2 items-center justify-center h-[38px] w-[170px] hover:bg-gray data-[is-active=true]:bg-gray rounded-lg data-[is-active=true]:font-semibold capitalize"
-                    >
-                      {link()}
-                      {linkName}
-                    </a>
-                  </li>
-                )
-              })
+              Object.keys(links).map((name) => (
+                <li>
+                  <a 
+                    href={`/${name}`}
+                    data-is-active={location.pathname === `/${name}` || (name === 'dashboard' && location.pathname === '/')} 
+                    className="flex gap-2 items-center justify-center h-[38px] w-[170px] hover:bg-gray data-[is-active=true]:bg-gray rounded-lg data-[is-active=true]:font-semibold capitalize"
+                  >
+                    {links[name as Links]()}
+                    {name}
+                  </a>
+                </li>
+              ))
             }
           </ul>
           <fieldset className="flex items-center pl-4 pr-3 border border-light-gray bg-gray rounded-xl gap-2 w-[319px] h-[43px] ">
@@ -168,10 +173,10 @@ function App() {
               </div>
               <div className="border-t border-light-gray mt-3 pt-4 flex flex-col lg:flex-row px-[22px] gap-9">
                 <div className="flex-1 relative">
-                  <button disabled={true} className="bg-light-gray size-[18px] flex items-center justify-center absolute rounded-full -left-5 top-1/2 -translate-y-1/2 disabled:opacity-[.38]"><RightArrow className="rotate-180" /></button>
+                  <button disabled={true} className="bg-light-gray size-[18px] flex items-center justify-center absolute rounded-full -left-5 top-1/2 -translate-y-1/2 disabled:opacity-[.38] disabled:pointer-events-none z-[1]"><RightArrow className="rotate-180" /></button>
                   <Chart />
-                  <button disabled={false} className="bg-light-gray size-[18px] flex items-center justify-center absolute rounded-full -right-6 top-1/2 -translate-y-1/2 disabled:opacity-[.38]"><RightArrow /></button>
-                  <div className="h-[150px] w-8 shadow-custom absolute -right-6 top-1/2 -translate-y-1/2 z-[1]"></div>
+                  <button disabled={false} className="bg-light-gray size-[18px] flex items-center justify-center absolute rounded-full -right-6 top-1/2 -translate-y-1/2 disabled:opacity-[.38] disabled:pointer-events-none z-[1]"><RightArrow /></button>
+                  <div className="h-[150px] w-8 shadow-custom absolute -right-6 top-1/2 -translate-y-1/2"></div>
                 </div>
                 <ul className="flex-1 grid grid-cols-2 gap-y-3.5 gap-x-4">
                   {
@@ -216,14 +221,19 @@ const Stats: FC<IData> = ({ price, name, rate, color }) =>
     </div>
   </div>;
 
-const Card: FC<ICard> = ({ icon, data }) => 
+const Card: FC<ICard> = ({ name, icon, data }) => 
   <div className="border border-light-gray rounded-2xl overflow-hidden">
     <div className="bg-hc border-b border-light-gray h-[50px] flex items-center justify-between font-medium px-4">
-      <h3 className="flex gap-2.5 text-gray-800 items-center text-sm">
+      <h3 className="flex gap-2.5 text-gray-800 items-center text-sm capitalize">
         {icon()}
-        {icon.name.substring(0, icon.name.length - 8)} Overview
+        {name} Overview
       </h3>
-      <a href={`/${icon.name.substring(0, icon.name.length - 8).toLowerCase()}`} className="text-[#4545FE] flex items-center gap-0.5 text-xs">View all<AngleRight /></a>
+      <a 
+        href={`/${name}`} 
+        className="text-[#4545FE] flex items-center gap-0.5 text-xs"
+      >
+        View all<AngleRight />
+      </a>
     </div>
     <ul className="mt-5 px-4 pb-4 flex justify-between">
       {
@@ -244,7 +254,7 @@ const Carousel: FC<{name: string, data: string[]}> = ({ name, data }) => {
 
   return (
     <div className="max-h-[286px] h-[286px] rounded-xl relative overflow-hidden">
-      <img src={`/src/assets/${name}-${slide + 1}.jpg`} alt={name} className="size-full object-cover" />
+      <img src={`/${name}-${slide + 1}.jpg`} alt={name} className="size-full object-cover" />
       <div className="absolute carousel-gradient text-white top-0 left-0 size-full flex flex-col justify-end p-4">
         <h2 className="text-sm font-medium uppercase">{name.split('-').join(' ')}</h2>
         <p className="text-lg font-semibold">{data[slide]}</p>
