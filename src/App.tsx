@@ -134,14 +134,14 @@ function App() {
             {
               Object.keys(links).map((name) => (
                 <li>
-                  <a 
-                    href={`/${name}`}
+                  <button 
+                    // href={`/${name}`}
                     data-is-active={location.pathname === `/${name}` || (name === 'dashboard' && location.pathname === '/')} 
                     className="flex gap-2 items-center justify-center h-[38px] w-[170px] hover:bg-gray data-[is-active=true]:bg-gray rounded-lg data-[is-active=true]:font-semibold capitalize"
                   >
                     {links[name as Links]()}
                     {name}
-                  </a>
+                  </button>
                 </li>
               ))
             }
@@ -163,7 +163,7 @@ function App() {
                     <h3 className="font-semibold text-xl">Sales Overview</h3>
                     <p className="text-xs text-mid-gray">Showing overview Jan 2022 - Sep 2022</p>
                   </div>
-                  <a href="/transactions" className="h-[46px] px-[37px] rounded-full border border-gray-300 flex items-center font-medium text-xs text-nowrap">View Transactions</a>
+                  <button className="h-[46px] px-[37px] rounded-full border border-gray-300 flex items-center font-medium text-xs text-nowrap">View Transactions</button>
                 </div>
                 <div className="mt-[15px] ml-auto w-fit text-deep-gray text-sm flex gap-3">
                   {
@@ -228,12 +228,12 @@ const Card: FC<ICard> = ({ name, icon, data }) =>
         {icon()}
         {name} Overview
       </h3>
-      <a 
-        href={`/${name}`} 
+      <button
+        // href={`/${name}`} 
         className="text-[#4545FE] flex items-center gap-0.5 text-xs"
       >
         View all<AngleRight />
-      </a>
+      </button>
     </div>
     <ul className="mt-5 px-4 pb-4 flex justify-between">
       {
@@ -254,7 +254,7 @@ const Carousel: FC<{name: string, data: string[]}> = ({ name, data }) => {
 
   return (
     <div className="max-h-[286px] h-[286px] rounded-xl relative overflow-hidden">
-      <img src={`/${name}-${slide + 1}.jpg`} alt={name} className="size-full object-cover" />
+      <img src={`/${name}-1.jpg`} alt={name} className="size-full object-cover" />
       <div className="absolute carousel-gradient text-white top-0 left-0 size-full flex flex-col justify-end p-4">
         <h2 className="text-sm font-medium uppercase">{name.split('-').join(' ')}</h2>
         <p className="text-lg font-semibold">{data[slide]}</p>
